@@ -33,8 +33,9 @@ export const AnalysisOverview: React.FC<AnalysisOverviewProps> = ({
   };
 
   const handleCopySummary = () => {
+    const summaryList = analysis.executiveSummary || [];
     const text = `EXECUTIVE SUMMARY - ${analysis.documentTitle}\n\n` +
-      analysis.executiveSummary.map((s, i) => `${i + 1}. ${s}`).join('\n') +
+      summaryList.map((s, i) => `${i + 1}. ${s}`).join('\n') +
       `\n\nOverall Risk: ${analysis.overallRiskScore}/100 (${analysis.overallRiskLabel})`;
     navigator.clipboard.writeText(text);
     setCopiedSummary(true);
@@ -147,7 +148,7 @@ export const AnalysisOverview: React.FC<AnalysisOverviewProps> = ({
         </div>
 
         <ul className="mt-4 space-y-2.5 text-stone-800 text-sm">
-          {analysis.executiveSummary.map((bullet, idx) => (
+          {(analysis.executiveSummary || []).map((bullet, idx) => (
             <li key={idx} className="flex items-start gap-3">
               <span className="w-5 h-5 rounded-full bg-amber-50 text-amber-800 flex items-center justify-center text-xs font-semibold shrink-0 mt-0.5">
                 {idx + 1}
@@ -169,7 +170,7 @@ export const AnalysisOverview: React.FC<AnalysisOverviewProps> = ({
         </div>
 
         <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-          {analysis.parties.map((party, idx) => (
+          {(analysis.parties || []).map((party, idx) => (
             <div key={idx} className="p-4 rounded-lg bg-stone-50/70 border border-stone-200">
               <div className="flex items-center justify-between">
                 <span className="font-semibold text-stone-900 text-sm">{party.name}</span>
@@ -195,7 +196,7 @@ export const AnalysisOverview: React.FC<AnalysisOverviewProps> = ({
           </div>
         </div>
 
-        {analysis.keyDeadlines.length === 0 ? (
+        {(!analysis.keyDeadlines || analysis.keyDeadlines.length === 0) ? (
           <p className="text-xs text-stone-500 mt-4 italic">No explicit statutory or contractual deadlines detected in the text.</p>
         ) : (
           <div className="mt-4 overflow-x-auto">
@@ -210,7 +211,7 @@ export const AnalysisOverview: React.FC<AnalysisOverviewProps> = ({
                 </tr>
               </thead>
               <tbody className="divide-y divide-stone-100">
-                {analysis.keyDeadlines.map((deadline) => (
+                {(analysis.keyDeadlines || []).map((deadline) => (
                   <tr key={deadline.id} className="hover:bg-stone-50/50">
                     <td className="py-2.5 px-3 font-medium text-stone-900">{deadline.title}</td>
                     <td className="py-2.5 px-3 font-semibold text-amber-800">{deadline.dueOrPeriod}</td>
@@ -263,12 +264,12 @@ export const AnalysisOverview: React.FC<AnalysisOverviewProps> = ({
             </div>
           </div>
           <span className="text-xs font-mono text-stone-500">
-            {Object.values(completedSteps).filter(Boolean).length} / {analysis.actionableChecklist.length} completed
+            {Object.values(completedSteps).filter(Boolean).length} / {(analysis.actionableChecklist || []).length} completed
           </span>
         </div>
 
         <div className="mt-4 space-y-2.5">
-          {analysis.actionableChecklist.map((item) => {
+          {(analysis.actionableChecklist || []).map((item) => {
             const isDone = completedSteps[item.id] || false;
             return (
               <div

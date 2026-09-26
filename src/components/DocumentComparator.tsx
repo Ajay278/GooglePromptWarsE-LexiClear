@@ -73,26 +73,27 @@ export const DocumentComparator: React.FC<DocumentComparatorProps> = ({
     setTimeout(() => setCopiedRedline(null), 2000);
   };
 
-  const getImpactBadge = (verdict: DiffDifference['impactVerdict']) => {
-    if (verdict.includes('Risk Added') || verdict.includes('Doc A')) {
+  const getImpactBadge = (verdict?: DiffDifference['impactVerdict'] | string | null) => {
+    const text = verdict || 'Neutral Difference';
+    if (text.includes('Risk Added') || text.includes('Doc A')) {
       return (
         <span className="text-[11px] px-2 py-0.5 rounded font-semibold bg-rose-100 text-rose-800 flex items-center gap-1">
           <AlertOctagon className="w-3 h-3" />
-          {verdict}
+          {text}
         </span>
       );
     }
-    if (verdict.includes('Doc B')) {
+    if (text.includes('Doc B')) {
       return (
         <span className="text-[11px] px-2 py-0.5 rounded font-semibold bg-emerald-100 text-emerald-800 flex items-center gap-1">
           <ShieldCheck className="w-3 h-3" />
-          {verdict}
+          {text}
         </span>
       );
     }
     return (
       <span className="text-[11px] px-2 py-0.5 rounded font-medium bg-stone-100 text-stone-700">
-        {verdict}
+        {text}
       </span>
     );
   };

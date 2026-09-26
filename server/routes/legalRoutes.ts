@@ -28,6 +28,7 @@ export const apiRateLimiter = rateLimit({
   max: 60, // Limit each IP to 60 legal AI requests per window
   standardHeaders: true, // Return rate limit info in `RateLimit-*` headers
   legacyHeaders: false, // Disable `X-RateLimit-*` headers
+  validate: false, // Suppress proxy validation warnings in containerized environments (Cloud Run/reverse proxy)
   message: {
     error: 'Too many requests from this IP address. Please wait a few minutes before trying again.',
   },

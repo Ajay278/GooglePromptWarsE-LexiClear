@@ -4,10 +4,10 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 export const CANDIDATE_MODELS = [
-  'gemini-2.5-flash',
+  'gemini-3.8-flash',
   'gemini-flash-latest',
   'gemini-3.1-flash-lite',
-  'gemini-3.8-flash',
+  'gemini-3.1-pro-preview',
 ];
 
 // Server-side GoogleGenAI client singleton
@@ -19,6 +19,18 @@ export const ai = new GoogleGenAI({
     },
   },
 });
+
+function isQuotaExhaustedError(err: unknown): boolean {
+  if (!err) return false;
+  const msg = err instanceof Error ? err.message : typeof err === 'string' ? err : JSON.stringify(err);
+  return (
+    msg.includes('429') ||
+    msg.includes('RESOURCE_EXHAUSTED') ||
+    msg.includes('Quota exceeded') ||
+    msg.includes('quota') ||
+    msg.includes('rate-limit')
+  );
+}
 
 /**
  * Robust JSON parser capable of extracting JSON from markdown code blocks or trailing prose
@@ -101,7 +113,14 @@ export async function generateWithModelFallback(params: ModelFallbackParams): Pr
         lastError = err;
         const msg = err instanceof Error ? err.message : String(err);
         console.warn(`[Gemini Fallback] Model ${model} attempt ${attempt} failed: ${msg}`);
-        // Brief exponential backoff before retry
+
+        // If the model is quota-exhausted (HTTP 429 / RESOURCE_EXHAUSTED), do not retry the same model
+        if (isQuotaExhaustedError(err)) {
+          console.warn(`[Gemini Fallback] Model ${model} quota exhausted. Immediately switching to next candidate model.`);
+          break;
+        }
+
+        // Brief exponential backoff before retry for transient errors
         await new Promise((r) => setTimeout(r, 200 * attempt));
       }
     }

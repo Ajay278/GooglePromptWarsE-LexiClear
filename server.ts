@@ -12,9 +12,12 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
+// Enable trust proxy so Express and express-rate-limit correctly identify client IPs behind Cloud Run / reverse proxies
+app.set('trust proxy', 1);
+
 const portArgIndex = process.argv.indexOf('--port');
-const portArg = portArgIndex !== -1 ? parseInt(process.argv[portArgIndex + 1]) : null;
-const PORT = portArg || 3000;
+const portArg = portArgIndex !== -1 ? parseInt(process.argv[portArgIndex + 1], 10) : null;
+const PORT = portArg || (process.env.PORT ? parseInt(process.env.PORT, 10) : 3000);
 
 app.use(express.json({ limit: '15mb' }));
 
@@ -33,12 +36,18 @@ app.use('/api', legalRouter);
 
 // Full-stack Vite middleware & static asset delivery
 const isProduction = process.env.NODE_ENV === 'production' || !process.argv.some(a => a.includes('tsx') || a.includes('--dev'));
-const hasDist = fs.existsSync(path.resolve(__dirname, 'dist', 'index.html'));
+const candidateDistDirs = [
+  path.resolve(__dirname, 'dist'),
+  __dirname,
+  path.resolve(process.cwd(), 'dist'),
+];
+const distDir = candidateDistDirs.find(dir => fs.existsSync(path.resolve(dir, 'index.html')));
+const hasDist = Boolean(distDir);
 
 if (hasDist && (isProduction || process.env.NODE_ENV === 'production')) {
-  app.use(express.static(path.resolve(__dirname, 'dist')));
+  app.use(express.static(distDir!));
   app.get('*', (_req: Request, res: Response) => {
-    res.sendFile(path.resolve(__dirname, 'dist', 'index.html'));
+    res.sendFile(path.resolve(distDir!, 'index.html'));
   });
 } else {
   const { createServer: createViteServer } = await import('vite');

@@ -8,17 +8,18 @@ interface ClauseBreakdownPanelProps {
 }
 
 export const ClauseBreakdownPanel: React.FC<ClauseBreakdownPanelProps> = ({
-  clauses,
+  clauses = [],
   onOpenClauseSimplifier,
 }) => {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
-  const categories = Array.from(new Set(clauses.map((c) => c.category)));
+  const safeClauses = clauses || [];
+  const categories = Array.from(new Set(safeClauses.map((c) => c?.category).filter(Boolean)));
 
-  const filteredClauses = clauses.filter((c) => {
+  const filteredClauses = safeClauses.filter((c) => {
     if (selectedCategory === 'all') return true;
-    return c.category === selectedCategory;
+    return c?.category === selectedCategory;
   });
 
   const handleCopyCounter = (id: string, text: string) => {
@@ -27,14 +28,15 @@ export const ClauseBreakdownPanel: React.FC<ClauseBreakdownPanelProps> = ({
     setTimeout(() => setCopiedId(null), 2000);
   };
 
-  const getWhoBenefitsBadge = (who: string) => {
-    if (who.includes('One-Sided')) {
-      return <span className="text-[11px] px-2 py-0.5 rounded font-semibold bg-rose-100 text-rose-800">{who}</span>;
+  const getWhoBenefitsBadge = (who?: string | null) => {
+    const text = who || 'Neutral / Unspecified';
+    if (text.includes('One-Sided') || text.includes('Company') || text.includes('Host') || text.includes('Vendor')) {
+      return <span className="text-[11px] px-2 py-0.5 rounded font-semibold bg-rose-100 text-rose-800">{text}</span>;
     }
-    if (who.includes('Mutual') || who.includes('Both')) {
-      return <span className="text-[11px] px-2 py-0.5 rounded font-semibold bg-emerald-100 text-emerald-800">{who}</span>;
+    if (text.includes('Mutual') || text.includes('Both') || text.includes('Balanced')) {
+      return <span className="text-[11px] px-2 py-0.5 rounded font-semibold bg-emerald-100 text-emerald-800">{text}</span>;
     }
-    return <span className="text-[11px] px-2 py-0.5 rounded font-medium bg-amber-100 text-amber-800">{who}</span>;
+    return <span className="text-[11px] px-2 py-0.5 rounded font-medium bg-amber-100 text-amber-800">{text}</span>;
   };
 
   return (

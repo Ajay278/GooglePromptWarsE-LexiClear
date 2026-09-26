@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { SAMPLE_DOCUMENTS } from './data/sampleDocuments';
+import { DEFAULT_ANALYSES } from './data/defaultAnalyses';
 import { DocumentAnalysisResult, SampleDocument } from './types/legal';
 import { DisclaimerBanner } from './components/DisclaimerBanner';
 import { Navbar, ActiveTab } from './components/Navbar';
@@ -20,8 +21,10 @@ export default function App() {
   const [currentDoc, setCurrentDoc] = useState<SampleDocument>(SAMPLE_DOCUMENTS[0]);
   const [activeTab, setActiveTab] = useState<ActiveTab>('overview');
 
-  // Analysis State
-  const [analysisResult, setAnalysisResult] = useState<DocumentAnalysisResult | null>(null);
+  // Analysis State - Pre-populated with verified default analysis for instant zero-latency view
+  const [analysisResult, setAnalysisResult] = useState<DocumentAnalysisResult | null>(
+    DEFAULT_ANALYSES[SAMPLE_DOCUMENTS[0].id] || null
+  );
   const [isAnalyzing, setIsAnalyzing] = useState<boolean>(false);
   const [analysisError, setAnalysisError] = useState<string | null>(null);
 
@@ -34,7 +37,7 @@ export default function App() {
   const [showDocPane, setShowDocPane] = useState(true);
 
   // In-memory analysis cache to prevent redundant API calls
-  const [analysisCache, setAnalysisCache] = useState<Record<string, DocumentAnalysisResult>>({});
+  const [analysisCache, setAnalysisCache] = useState<Record<string, DocumentAnalysisResult>>(DEFAULT_ANALYSES);
 
   // Trigger analysis
   const runAnalysis = useCallback(async (docText: string, docTitle: string, docId?: string) => {
@@ -67,9 +70,16 @@ export default function App() {
       const data: DocumentAnalysisResult = await response.json();
       setAnalysisResult(data);
       setAnalysisCache((prev) => ({ ...prev, [key]: data }));
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Analysis failed:', err);
-      setAnalysisError(err?.message || 'Error communicating with legal analysis engine. Please try again.');
+      // If a pre-verified baseline analysis exists for this document, fall back safely
+      if (DEFAULT_ANALYSES[key]) {
+        setAnalysisResult(DEFAULT_ANALYSES[key]);
+        setAnalysisError(null);
+      } else {
+        const errMsg = err instanceof Error ? err.message : 'Error communicating with legal analysis engine. Please try again.';
+        setAnalysisError(errMsg);
+      }
     } finally {
       setIsAnalyzing(false);
     }

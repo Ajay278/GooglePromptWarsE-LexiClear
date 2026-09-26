@@ -8,15 +8,17 @@ interface RiskAuditPanelProps {
 }
 
 export const RiskAuditPanel: React.FC<RiskAuditPanelProps> = ({
-  risks,
+  risks = [],
   onOpenClauseSimplifier,
 }) => {
   const [filterSeverity, setFilterSeverity] = useState<string>('all');
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
-  const filteredRisks = risks.filter((r) => {
+  const safeRisks = risks || [];
+
+  const filteredRisks = safeRisks.filter((r) => {
     if (filterSeverity === 'all') return true;
-    return r.severity === filterSeverity;
+    return r?.severity === filterSeverity;
   });
 
   const handleCopyRedline = (id: string, text: string) => {
@@ -57,10 +59,10 @@ export const RiskAuditPanel: React.FC<RiskAuditPanelProps> = ({
   };
 
   const counts = {
-    all: risks.length,
-    critical: risks.filter((r) => r.severity === 'critical').length,
-    high: risks.filter((r) => r.severity === 'high').length,
-    medium: risks.filter((r) => r.severity === 'medium').length,
+    all: safeRisks.length,
+    critical: safeRisks.filter((r) => r?.severity === 'critical').length,
+    high: safeRisks.filter((r) => r?.severity === 'high').length,
+    medium: safeRisks.filter((r) => r?.severity === 'medium').length,
   };
 
   return (

@@ -159,7 +159,7 @@ export const GroundedQA: React.FC<GroundedQAProps> = ({
                   handleAsk(p.text);
                 }}
                 className={`text-[11px] px-2.5 py-1 rounded-md border text-left cursor-pointer transition-colors flex items-center gap-1.5 ${
-                  p.expected.includes('Not in Document')
+                  p.expected?.includes('Not in Document')
                     ? 'bg-stone-50 hover:bg-rose-50 text-stone-700 hover:text-rose-900 border-stone-200 hover:border-rose-300'
                     : 'bg-stone-50 hover:bg-amber-50 text-stone-700 hover:text-amber-900 border-stone-200 hover:border-amber-300'
                 }`}
@@ -167,12 +167,12 @@ export const GroundedQA: React.FC<GroundedQAProps> = ({
                 <span>{p.text}</span>
                 <span
                   className={`text-[9px] px-1 rounded uppercase tracking-wider ${
-                    p.expected.includes('Not in Document')
+                    p.expected?.includes('Not in Document')
                       ? 'bg-rose-100 text-rose-800 font-bold'
                       : 'bg-stone-200 text-stone-600'
                   }`}
                 >
-                  {p.expected.includes('Not in Document') ? 'Missing Test' : 'Grounded'}
+                  {p.expected?.includes('Not in Document') ? 'Missing Test' : 'Grounded'}
                 </span>
               </button>
             ))}

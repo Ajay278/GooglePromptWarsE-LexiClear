@@ -70,6 +70,11 @@ export const ConsultationPrep: React.FC<ConsultationPrepProps> = ({
   const handleCopyMarkdown = () => {
     if (!brief) return;
 
+    const risks = brief.topLegalRisks || [];
+    const questions = brief.questionsForAttorney || [];
+    const exhibits = brief.suggestedExhibitsAndEvidence || [];
+    const terms = brief.keyTermsDefined || [];
+
     const md = `# ATTORNEY CONSULTATION BRIEF
 **Document:** ${documentTitle}
 **Client Role:** ${brief.clientRole}
@@ -82,16 +87,16 @@ export const ConsultationPrep: React.FC<ConsultationPrepProps> = ({
 ${brief.documentSummary}
 
 ## 2. High-Priority Legal Risks & Citations
-${brief.topLegalRisks.map((r, i) => `### ${i + 1}. [${r.priority}] ${r.risk}\n**Contract Citation:** "${r.citation}"\n`).join('\n')}
+${risks.map((r, i) => `### ${i + 1}. [${r.priority}] ${r.risk}\n**Contract Citation:** "${r.citation}"\n`).join('\n')}
 
 ## 3. Targeted Questions to Ask Attorney (To Save Billable Hours)
-${brief.questionsForAttorney.map((q, i) => `### Question ${i + 1}: ${q.question}\n- **Context:** ${q.context}\n- **Desired Strategy/Outcome:** ${q.expectedGoal}\n`).join('\n')}
+${questions.map((q, i) => `### Question ${i + 1}: ${q.question}\n- **Context:** ${q.context}\n- **Desired Strategy/Outcome:** ${q.expectedGoal}\n`).join('\n')}
 
 ## 4. Suggested Exhibits & Evidence to Bring
-${brief.suggestedExhibitsAndEvidence.map((e) => `- [ ] ${e}`).join('\n')}
+${exhibits.map((e) => `- [ ] ${e}`).join('\n')}
 
 ## 5. Key Defined Legal Terms
-${brief.keyTermsDefined.map((t) => `- **${t.term}:** ${t.definition}`).join('\n')}
+${terms.map((t) => `- **${t.term}:** ${t.definition}`).join('\n')}
 
 ---
 *Notice: This brief provides informational assistance to prepare for an attorney consultation and does not constitute formal legal representation.*
@@ -232,10 +237,10 @@ ${brief.keyTermsDefined.map((t) => `- **${t.term}:** ${t.definition}`).join('\n'
           {/* Section 2: High-Priority Legal Risks & Citations */}
           <div className="space-y-3 text-xs">
             <span className="font-semibold uppercase tracking-wider text-stone-500 block">
-              2. Key Contractual Risks to Flag to Counsel ({brief.topLegalRisks.length})
+              2. Key Contractual Risks to Flag to Counsel ({(brief.topLegalRisks || []).length})
             </span>
             <div className="space-y-2.5">
-              {brief.topLegalRisks.map((risk, idx) => (
+              {(brief.topLegalRisks || []).map((risk, idx) => (
                 <div key={idx} className="p-3.5 rounded-lg border border-stone-200 bg-stone-50/50">
                   <div className="flex items-center justify-between mb-1">
                     <span className="font-semibold text-stone-900 text-sm">{risk.risk}</span>
@@ -259,7 +264,7 @@ ${brief.keyTermsDefined.map((t) => `- **${t.term}:** ${t.definition}`).join('\n'
               3. Specific Questions to Ask the Attorney (Optimized for Efficiency)
             </span>
             <div className="space-y-3">
-              {brief.questionsForAttorney.map((item, idx) => (
+              {(brief.questionsForAttorney || []).map((item, idx) => (
                 <div key={idx} className="p-4 rounded-lg border border-amber-200/80 bg-amber-50/30">
                   <div className="flex items-start gap-2">
                     <span className="w-5 h-5 rounded-full bg-amber-100 text-amber-900 font-bold flex items-center justify-center shrink-0 mt-0.5 text-xs">
@@ -288,7 +293,7 @@ ${brief.keyTermsDefined.map((t) => `- **${t.term}:** ${t.definition}`).join('\n'
               4. Evidence & Documentation to Bring to the Meeting
             </span>
             <ul className="grid grid-cols-1 md:grid-cols-2 gap-2">
-              {brief.suggestedExhibitsAndEvidence.map((doc, idx) => (
+              {(brief.suggestedExhibitsAndEvidence || []).map((doc, idx) => (
                 <li key={idx} className="p-2.5 bg-stone-50 rounded border border-stone-200 text-stone-700 flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-stone-400" />
                   <span>{doc}</span>
