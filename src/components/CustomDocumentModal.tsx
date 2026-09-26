@@ -16,6 +16,18 @@ export const CustomDocumentModal: React.FC<CustomDocumentModalProps> = ({
   const [text, setText] = useState('');
   const [fileName, setFileName] = useState('');
 
+  // Close on Escape key press
+  React.useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -43,15 +55,23 @@ export const CustomDocumentModal: React.FC<CustomDocumentModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/60 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-white rounded-xl shadow-2xl border border-stone-200 w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden">
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="custom-doc-modal-title"
+        className="bg-white rounded-xl shadow-2xl border border-stone-200 w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden"
+      >
         {/* Header */}
         <div className="px-6 py-4 border-b border-stone-200 flex items-center justify-between bg-stone-50">
           <div className="flex items-center gap-2">
             <FileText className="w-5 h-5 text-stone-700" />
-            <h3 className="font-semibold text-stone-900 text-base">Analyze Custom Legal Document</h3>
+            <h3 id="custom-doc-modal-title" className="font-semibold text-stone-900 text-base">
+              Analyze Custom Legal Document
+            </h3>
           </div>
           <button
             onClick={onClose}
+            aria-label="Close custom document dialog"
             className="text-stone-400 hover:text-stone-700 p-1.5 rounded-lg hover:bg-stone-200/60 cursor-pointer transition-colors"
           >
             <X className="w-5 h-5" />
@@ -61,10 +81,11 @@ export const CustomDocumentModal: React.FC<CustomDocumentModalProps> = ({
         {/* Form Body */}
         <form onSubmit={handleSubmit} className="p-6 overflow-y-auto space-y-4">
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-stone-700 mb-1">
+            <label htmlFor="custom-doc-title" className="block text-xs font-semibold uppercase tracking-wider text-stone-700 mb-1">
               Document Title / Name:
             </label>
             <input
+              id="custom-doc-title"
               type="text"
               placeholder="e.g. Master Consulting Agreement v2"
               value={title}
@@ -85,6 +106,7 @@ export const CustomDocumentModal: React.FC<CustomDocumentModalProps> = ({
                 accept=".txt,.md,.text"
                 onChange={handleFileUpload}
                 className="hidden"
+                aria-label="Upload contract text file"
               />
             </label>
             {fileName && (
@@ -95,10 +117,11 @@ export const CustomDocumentModal: React.FC<CustomDocumentModalProps> = ({
           </div>
 
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-stone-700 mb-1">
+            <label htmlFor="custom-doc-content" className="block text-xs font-semibold uppercase tracking-wider text-stone-700 mb-1">
               Contract Text / Content:
             </label>
             <textarea
+              id="custom-doc-content"
               rows={9}
               placeholder="Paste contract terms, NDA clauses, employment offer terms, or lease provisions here..."
               value={text}

@@ -83,8 +83,9 @@ export const GroundedQA: React.FC<GroundedQAProps> = ({
       const data: GroundedAnswer = await response.json();
       setHistory((prev) => [{ question: q, response: data }, ...prev]);
       if (!queryToAsk) setQuestion('');
-    } catch (err: any) {
-      setError(err?.message || 'Error processing inquiry');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Error processing inquiry';
+      setError(msg);
     } finally {
       setLoading(false);
     }
@@ -111,11 +112,12 @@ export const GroundedQA: React.FC<GroundedQAProps> = ({
       {/* Query Input Card */}
       <div className="bg-white p-5 rounded-xl border border-stone-200 shadow-sm space-y-4">
         <div>
-          <label className="block text-xs font-semibold uppercase tracking-wider text-stone-700 mb-2">
+          <label htmlFor="grounded-qa-input" className="block text-xs font-semibold uppercase tracking-wider text-stone-700 mb-2">
             Ask Any Question Regarding This Agreement:
           </label>
           <div className="flex gap-2">
             <input
+              id="grounded-qa-input"
               type="text"
               value={question}
               onChange={(e) => setQuestion(e.target.value)}

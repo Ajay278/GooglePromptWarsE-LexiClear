@@ -1,11 +1,18 @@
-import jsPDF from 'jspdf';
-import { DocumentAnalysisResult } from '../types/legal';
+import { DocumentAnalysisResult, ConsultationBrief } from '../types/legal';
 
-export function exportLegalAnalysisToPDF(
+export function cleanPdfFilename(title: string): string {
+  return title
+    .replace(/[^a-zA-Z0-9_-]/g, '_')
+    .slice(0, 40)
+    .toLowerCase() || 'document';
+}
+
+export async function exportLegalAnalysisToPDF(
   analysis: DocumentAnalysisResult,
   documentTitle: string,
   rawDocumentText?: string
 ) {
+  const { default: jsPDF } = await import('jspdf');
   const doc = new jsPDF({
     orientation: 'portrait',
     unit: 'pt',
@@ -353,17 +360,15 @@ export function exportLegalAnalysisToPDF(
   }
 
   // Download filename
-  const cleanTitle = documentTitle
-    .replace(/[^a-zA-Z0-9_-]/g, '_')
-    .slice(0, 40)
-    .toLowerCase();
+  const cleanTitle = cleanPdfFilename(documentTitle);
   doc.save(`LexiClear_Legal_Report_${cleanTitle}.pdf`);
 }
 
-export function exportConsultationBriefToPDF(
-  brief: import('../types/legal').ConsultationBrief,
+export async function exportConsultationBriefToPDF(
+  brief: ConsultationBrief,
   documentTitle: string
 ) {
+  const { default: jsPDF } = await import('jspdf');
   const doc = new jsPDF({
     orientation: 'portrait',
     unit: 'pt',
@@ -592,10 +597,7 @@ export function exportConsultationBriefToPDF(
     doc.line(margin, pageHeight - 28, pageWidth - margin, pageHeight - 28);
   }
 
-  const cleanTitle = documentTitle
-    .replace(/[^a-zA-Z0-9_-]/g, '_')
-    .slice(0, 40)
-    .toLowerCase();
+  const cleanTitle = cleanPdfFilename(documentTitle);
   doc.save(`Attorney_Briefing_${cleanTitle}.pdf`);
 }
 

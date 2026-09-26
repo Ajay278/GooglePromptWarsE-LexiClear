@@ -110,10 +110,10 @@ export default function App() {
     setActiveTab('qa');
   };
 
-  const handleDownloadAnalysisPdf = () => {
+  const handleDownloadAnalysisPdf = async () => {
     if (!analysisResult) return;
     try {
-      exportLegalAnalysisToPDF(analysisResult, currentDoc.title, currentDoc.content);
+      await exportLegalAnalysisToPDF(analysisResult, currentDoc.title, currentDoc.content);
     } catch (e) {
       console.error('Failed to export legal analysis to PDF:', e);
     }

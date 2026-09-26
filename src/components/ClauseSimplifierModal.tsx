@@ -32,6 +32,18 @@ export const ClauseSimplifierModal: React.FC<ClauseSimplifierModalProps> = ({
     }
   }, [initialClause]);
 
+  // Handle escape key to close modal
+  React.useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
 
   const handleSimplify = async () => {
@@ -49,8 +61,9 @@ export const ClauseSimplifierModal: React.FC<ClauseSimplifierModalProps> = ({
       }
       const data = await response.json();
       setResult(data);
-    } catch (err: any) {
-      setError(err?.message || 'Error communicating with analysis engine');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Error communicating with analysis engine';
+      setError(msg);
     } finally {
       setLoading(false);
     }
@@ -81,7 +94,12 @@ export const ClauseSimplifierModal: React.FC<ClauseSimplifierModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/60 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-white rounded-xl shadow-2xl border border-stone-200 w-full max-w-3xl max-h-[90vh] flex flex-col overflow-hidden">
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="clause-modal-title"
+        className="bg-white rounded-xl shadow-2xl border border-stone-200 w-full max-w-3xl max-h-[90vh] flex flex-col overflow-hidden"
+      >
         {/* Modal Header */}
         <div className="px-6 py-4 border-b border-stone-200 flex items-center justify-between bg-stone-50">
           <div className="flex items-center gap-2.5">
@@ -89,12 +107,15 @@ export const ClauseSimplifierModal: React.FC<ClauseSimplifierModalProps> = ({
               <Scale className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="font-semibold text-stone-900 text-base">Instant Clause Simplifier & Trap Detector</h3>
+              <h3 id="clause-modal-title" className="font-semibold text-stone-900 text-base">
+                Instant Clause Simplifier & Trap Detector
+              </h3>
               <p className="text-xs text-stone-500">Translate dense legalese into plain English, detect one-sided terms, and generate counter-proposals</p>
             </div>
           </div>
           <button
             onClick={onClose}
+            aria-label="Close clause simplifier dialog"
             className="text-stone-400 hover:text-stone-700 p-1.5 rounded-lg hover:bg-stone-200/60 cursor-pointer transition-colors"
           >
             <X className="w-5 h-5" />
@@ -121,10 +142,11 @@ export const ClauseSimplifierModal: React.FC<ClauseSimplifierModalProps> = ({
 
           {/* Text Area */}
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1.5">
+            <label htmlFor="clause-input" className="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1.5">
               Paste or Edit Legal Clause:
             </label>
             <textarea
+              id="clause-input"
               value={clauseText}
               onChange={(e) => setClauseText(e.target.value)}
               placeholder="Paste any contract section, clause, warranty disclaimer, or covenant here..."

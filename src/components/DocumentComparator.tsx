@@ -122,6 +122,7 @@ export const DocumentComparator: React.FC<DocumentComparatorProps> = ({
               <span className="text-xs text-stone-500 font-medium">{docA.title}</span>
             </div>
             <textarea
+              aria-label="Document A text to compare"
               value={docA.text}
               onChange={(e) => setDocA({ ...docA, text: e.target.value })}
               placeholder="Paste first contract text here..."
@@ -138,12 +139,14 @@ export const DocumentComparator: React.FC<DocumentComparatorProps> = ({
               </span>
               <input
                 type="text"
+                aria-label="Document B title"
                 value={docB.title}
                 onChange={(e) => setDocB({ ...docB, title: e.target.value })}
                 className="text-xs text-stone-700 font-medium px-2 py-0.5 bg-white border border-stone-300 rounded focus:outline-none"
               />
             </div>
             <textarea
+              aria-label="Document B text to compare"
               value={docB.text}
               onChange={(e) => setDocB({ ...docB, text: e.target.value })}
               placeholder="Paste second contract or redline version here to compare..."
@@ -157,6 +160,7 @@ export const DocumentComparator: React.FC<DocumentComparatorProps> = ({
         <div className="mt-4 flex flex-col sm:flex-row items-center justify-between gap-3 pt-3 border-t border-stone-100">
           <input
             type="text"
+            aria-label="Optional comparison focus area"
             placeholder="Optional specific focus (e.g., 'liability caps and termination rights')..."
             value={comparisonFocus}
             onChange={(e) => setComparisonFocus(e.target.value)}

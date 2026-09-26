@@ -24,11 +24,11 @@ export const ConsultationPrep: React.FC<ConsultationPrepProps> = ({
   const [copiedBrief, setCopiedBrief] = useState(false);
   const [downloadingPdf, setDownloadingPdf] = useState(false);
 
-  const handleDownloadBriefPdf = () => {
+  const handleDownloadBriefPdf = async () => {
     if (!brief) return;
     setDownloadingPdf(true);
     try {
-      exportConsultationBriefToPDF(brief, documentTitle);
+      await exportConsultationBriefToPDF(brief, documentTitle);
     } catch (e) {
       console.error('Failed to export brief to PDF:', e);
     } finally {
