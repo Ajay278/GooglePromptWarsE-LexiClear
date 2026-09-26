@@ -1,0 +1,6 @@
+{
+  "name": "LexiClear Legal Navigator",
+  "description": "Grounded legal document simplification, contract comparison, risk detection, strict citation Q&A, and attorney consultation prep.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
