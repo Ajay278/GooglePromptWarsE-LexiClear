@@ -2,6 +2,7 @@ import { Router } from 'express';
 import type { Request, Response } from 'express';
 import rateLimit from 'express-rate-limit';
 import { generateWithModelFallback, safeParseJson } from '../services/gemini';
+import { serverCache, MemoryCache } from '../services/cache';
 import {
   DOCUMENT_ANALYSIS_SYSTEM_INSTRUCTION,
   buildDocumentAnalysisPrompt,
@@ -42,6 +43,7 @@ legalRouter.use(apiRateLimiter);
  * Full document risk audit, score, and clause breakdown
  */
 legalRouter.post('/analyze-document', async (req: Request, res: Response) => {
+  const startTime = Date.now();
   try {
     const { documentText, userRole } = req.body;
 
@@ -55,6 +57,14 @@ legalRouter.post('/analyze-document', async (req: Request, res: Response) => {
       });
     }
 
+    const cacheKey = MemoryCache.generateKey('analyze', { documentText, userRole });
+    const cached = serverCache.get(cacheKey);
+    if (cached) {
+      res.setHeader('X-Cache', 'HIT');
+      res.setHeader('X-Response-Time-Ms', Date.now() - startTime);
+      return res.json(cached);
+    }
+
     const prompt = buildDocumentAnalysisPrompt(documentText, typeof userRole === 'string' ? userRole : 'Neutral');
     const rawText = await generateWithModelFallback({
       contents: prompt,
@@ -64,6 +74,9 @@ legalRouter.post('/analyze-document', async (req: Request, res: Response) => {
     });
 
     const parsed = safeParseJson(rawText);
+    serverCache.set(cacheKey, parsed);
+    res.setHeader('X-Cache', 'MISS');
+    res.setHeader('X-Response-Time-Ms', Date.now() - startTime);
     return res.json(parsed);
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown internal error';
@@ -79,6 +92,7 @@ legalRouter.post('/analyze-document', async (req: Request, res: Response) => {
  * Strictly grounded Q&A with required citations
  */
 legalRouter.post('/ask-question', async (req: Request, res: Response) => {
+  const startTime = Date.now();
   try {
     const { documentText, question } = req.body;
 
@@ -100,6 +114,14 @@ legalRouter.post('/ask-question', async (req: Request, res: Response) => {
       });
     }
 
+    const cacheKey = MemoryCache.generateKey('ask', { documentText, question });
+    const cached = serverCache.get(cacheKey);
+    if (cached) {
+      res.setHeader('X-Cache', 'HIT');
+      res.setHeader('X-Response-Time-Ms', Date.now() - startTime);
+      return res.json(cached);
+    }
+
     const prompt = buildQuestionAnswerPrompt(documentText, question);
     const rawText = await generateWithModelFallback({
       contents: prompt,
@@ -109,6 +131,9 @@ legalRouter.post('/ask-question', async (req: Request, res: Response) => {
     });
 
     const parsed = safeParseJson(rawText);
+    serverCache.set(cacheKey, parsed);
+    res.setHeader('X-Cache', 'MISS');
+    res.setHeader('X-Response-Time-Ms', Date.now() - startTime);
     return res.json(parsed);
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown internal error';
@@ -124,6 +149,7 @@ legalRouter.post('/ask-question', async (req: Request, res: Response) => {
  * Redline comparison between two contract versions
  */
 legalRouter.post('/compare-documents', async (req: Request, res: Response) => {
+  const startTime = Date.now();
   try {
     const { documentA, documentB, roleA, roleB } = req.body;
 
@@ -145,6 +171,14 @@ legalRouter.post('/compare-documents', async (req: Request, res: Response) => {
       });
     }
 
+    const cacheKey = MemoryCache.generateKey('compare', { documentA, documentB, roleA, roleB });
+    const cached = serverCache.get(cacheKey);
+    if (cached) {
+      res.setHeader('X-Cache', 'HIT');
+      res.setHeader('X-Response-Time-Ms', Date.now() - startTime);
+      return res.json(cached);
+    }
+
     const prompt = buildDocumentComparisonPrompt(
       documentA,
       documentB,
@@ -159,6 +193,9 @@ legalRouter.post('/compare-documents', async (req: Request, res: Response) => {
     });
 
     const parsed = safeParseJson(rawText);
+    serverCache.set(cacheKey, parsed);
+    res.setHeader('X-Cache', 'MISS');
+    res.setHeader('X-Response-Time-Ms', Date.now() - startTime);
     return res.json(parsed);
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown internal error';
@@ -174,6 +211,7 @@ legalRouter.post('/compare-documents', async (req: Request, res: Response) => {
  * Plain-English translation and trap exposer for individual clauses
  */
 legalRouter.post('/simplify-clause', async (req: Request, res: Response) => {
+  const startTime = Date.now();
   try {
     const { clauseText, contractType } = req.body;
 
@@ -184,6 +222,14 @@ legalRouter.post('/simplify-clause', async (req: Request, res: Response) => {
       return res.status(400).json({
         error: `Clause text exceeds maximum allowed length of ${MAX_CLAUSE_LENGTH.toLocaleString()} characters.`,
       });
+    }
+
+    const cacheKey = MemoryCache.generateKey('simplify', { clauseText, contractType });
+    const cached = serverCache.get(cacheKey);
+    if (cached) {
+      res.setHeader('X-Cache', 'HIT');
+      res.setHeader('X-Response-Time-Ms', Date.now() - startTime);
+      return res.json(cached);
     }
 
     const prompt = buildClauseSimplificationPrompt(
@@ -198,6 +244,9 @@ legalRouter.post('/simplify-clause', async (req: Request, res: Response) => {
     });
 
     const parsed = safeParseJson(rawText);
+    serverCache.set(cacheKey, parsed);
+    res.setHeader('X-Cache', 'MISS');
+    res.setHeader('X-Response-Time-Ms', Date.now() - startTime);
     return res.json(parsed);
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown internal error';
@@ -213,6 +262,7 @@ legalRouter.post('/simplify-clause', async (req: Request, res: Response) => {
  * Attorney briefing docket generator
  */
 legalRouter.post('/generate-consultation-prep', async (req: Request, res: Response) => {
+  const startTime = Date.now();
   try {
     const { documentText, userRole } = req.body;
 
@@ -225,6 +275,14 @@ legalRouter.post('/generate-consultation-prep', async (req: Request, res: Respon
       });
     }
 
+    const cacheKey = MemoryCache.generateKey('prep', { documentText, userRole });
+    const cached = serverCache.get(cacheKey);
+    if (cached) {
+      res.setHeader('X-Cache', 'HIT');
+      res.setHeader('X-Response-Time-Ms', Date.now() - startTime);
+      return res.json(cached);
+    }
+
     const prompt = buildConsultationPrepPrompt(documentText, typeof userRole === 'string' ? userRole : 'Client');
     const rawText = await generateWithModelFallback({
       contents: prompt,
@@ -234,6 +292,9 @@ legalRouter.post('/generate-consultation-prep', async (req: Request, res: Respon
     });
 
     const parsed = safeParseJson(rawText);
+    serverCache.set(cacheKey, parsed);
+    res.setHeader('X-Cache', 'MISS');
+    res.setHeader('X-Response-Time-Ms', Date.now() - startTime);
     return res.json(parsed);
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown internal error';

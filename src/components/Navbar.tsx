@@ -110,10 +110,19 @@ export const Navbar: React.FC<NavbarProps> = ({
 
       {/* Navigation Tabs Bar */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 border-t border-stone-100 flex items-center justify-between overflow-x-auto">
-        <nav className="flex items-center space-x-1 sm:space-x-2 py-1.5 min-w-max">
+        <nav
+          role="tablist"
+          aria-label="Legal Navigator sections"
+          className="flex items-center space-x-1 sm:space-x-2 py-1.5 min-w-max"
+        >
           <button
+            role="tab"
+            id="tab-overview"
+            aria-selected={activeTab === 'overview'}
+            aria-controls="panel-overview"
+            tabIndex={activeTab === 'overview' ? 0 : -1}
             onClick={() => setActiveTab('overview')}
-            className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors cursor-pointer flex items-center gap-1.5 ${
+            className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors cursor-pointer flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 ${
               activeTab === 'overview'
                 ? 'bg-stone-900 text-white shadow-xs'
                 : 'text-stone-600 hover:text-stone-950 hover:bg-stone-100'
@@ -124,8 +133,13 @@ export const Navbar: React.FC<NavbarProps> = ({
           </button>
 
           <button
+            role="tab"
+            id="tab-risks"
+            aria-selected={activeTab === 'risks'}
+            aria-controls="panel-risks"
+            tabIndex={activeTab === 'risks' ? 0 : -1}
             onClick={() => setActiveTab('risks')}
-            className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors cursor-pointer flex items-center gap-1.5 ${
+            className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors cursor-pointer flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 ${
               activeTab === 'risks'
                 ? 'bg-stone-900 text-white shadow-xs'
                 : 'text-stone-600 hover:text-stone-950 hover:bg-stone-100'
@@ -136,8 +150,13 @@ export const Navbar: React.FC<NavbarProps> = ({
           </button>
 
           <button
+            role="tab"
+            id="tab-clauses"
+            aria-selected={activeTab === 'clauses'}
+            aria-controls="panel-clauses"
+            tabIndex={activeTab === 'clauses' ? 0 : -1}
             onClick={() => setActiveTab('clauses')}
-            className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors cursor-pointer flex items-center gap-1.5 ${
+            className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors cursor-pointer flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 ${
               activeTab === 'clauses'
                 ? 'bg-stone-900 text-white shadow-xs'
                 : 'text-stone-600 hover:text-stone-950 hover:bg-stone-100'
@@ -148,8 +167,13 @@ export const Navbar: React.FC<NavbarProps> = ({
           </button>
 
           <button
+            role="tab"
+            id="tab-compare"
+            aria-selected={activeTab === 'compare'}
+            aria-controls="panel-compare"
+            tabIndex={activeTab === 'compare' ? 0 : -1}
             onClick={() => setActiveTab('compare')}
-            className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors cursor-pointer flex items-center gap-1.5 ${
+            className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors cursor-pointer flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${
               activeTab === 'compare'
                 ? 'bg-stone-900 text-white shadow-xs'
                 : 'text-stone-600 hover:text-stone-950 hover:bg-stone-100'
@@ -160,8 +184,13 @@ export const Navbar: React.FC<NavbarProps> = ({
           </button>
 
           <button
+            role="tab"
+            id="tab-qa"
+            aria-selected={activeTab === 'qa'}
+            aria-controls="panel-qa"
+            tabIndex={activeTab === 'qa' ? 0 : -1}
             onClick={() => setActiveTab('qa')}
-            className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors cursor-pointer flex items-center gap-1.5 ${
+            className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors cursor-pointer flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 ${
               activeTab === 'qa'
                 ? 'bg-stone-900 text-white shadow-xs'
                 : 'text-stone-600 hover:text-stone-950 hover:bg-stone-100'
@@ -172,8 +201,13 @@ export const Navbar: React.FC<NavbarProps> = ({
           </button>
 
           <button
+            role="tab"
+            id="tab-prep"
+            aria-selected={activeTab === 'prep'}
+            aria-controls="panel-prep"
+            tabIndex={activeTab === 'prep' ? 0 : -1}
             onClick={() => setActiveTab('prep')}
-            className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors cursor-pointer flex items-center gap-1.5 ${
+            className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors cursor-pointer flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 ${
               activeTab === 'prep'
                 ? 'bg-stone-900 text-white shadow-xs'
                 : 'text-stone-600 hover:text-stone-950 hover:bg-stone-100'

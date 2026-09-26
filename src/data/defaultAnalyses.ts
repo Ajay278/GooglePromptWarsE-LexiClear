@@ -460,3 +460,7 @@ export const DEFAULT_ANALYSES: Record<string, DocumentAnalysisResult> = {
     ]
   }
 };
+
+// Alias contractor-agreement to consulting-agreement for seamless lookup
+DEFAULT_ANALYSES['contractor-agreement'] = DEFAULT_ANALYSES['consulting-agreement'];
+

@@ -131,6 +131,14 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-stone-100 flex flex-col font-sans text-stone-900">
+      {/* Skip to Main Content Link for Screen Readers & Keyboard Users */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:px-4 focus:py-2 focus:bg-amber-900 focus:text-white focus:rounded-md focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-amber-400"
+      >
+        Skip to main content
+      </a>
+
       {/* 1. Legal Disclaimer Banner */}
       <DisclaimerBanner />
 
@@ -184,10 +192,10 @@ export default function App() {
       </div>
 
       {/* Main Workspace */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <main id="main-content" tabIndex={-1} className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 focus:outline-none">
         {/* Loading State Overlay */}
         {isAnalyzing && (
-          <div className="mb-6 p-5 bg-white rounded-xl border border-amber-200 shadow-sm flex items-center gap-4 animate-pulse">
+          <div className="mb-6 p-5 bg-white rounded-xl border border-amber-200 shadow-sm flex items-center gap-4 animate-pulse" role="status" aria-live="polite">
             <div className="w-10 h-10 rounded-lg bg-amber-100 flex items-center justify-center text-amber-800 shrink-0">
               <Sparkles className="w-5 h-5 animate-spin" />
             </div>
@@ -203,7 +211,7 @@ export default function App() {
         )}
 
         {analysisError && (
-          <div className="mb-6 p-4 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-800 flex items-start justify-between gap-3 shadow-xs">
+          <div className="mb-6 p-4 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-800 flex items-start justify-between gap-3 shadow-xs" role="alert">
             <div className="flex items-start gap-3">
               <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
               <div>
@@ -237,7 +245,12 @@ export default function App() {
           )}
 
           {/* Right Pane: Intelligence & Navigation Modules (7 cols or 12 cols) */}
-          <div className={showDocPane ? 'lg:col-span-7 space-y-6' : 'w-full space-y-6'}>
+          <div
+            role="tabpanel"
+            id={`panel-${activeTab}`}
+            aria-labelledby={`tab-${activeTab}`}
+            className={showDocPane ? 'lg:col-span-7 space-y-6' : 'w-full space-y-6'}
+          >
             {/* Tab 1: Executive Overview & Deadlines */}
             {activeTab === 'overview' && (
               analysisResult ? (
