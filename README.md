@@ -1,8 +1,48 @@
 # LexiClear Legal Navigator
 
 > **Intelligent, Grounded Legal Document Analysis, Contract Comparison, Risk Detection, and Attorney Consultation Prep.**
+> *Built for Google PromptWars*
 
 LexiClear Legal Navigator is a production-grade full-stack web application designed to bridge the gap between non-lawyers and dense legal agreements. It translates legalese into plain English, flags hidden contractual traps with exact verbatim citations, compares contract versions with redline differentials, answers targeted questions under strict anti-hallucination constraints, and equips users with structured briefs for attorney consultations.
+
+---
+
+## 🏆 Google PromptWars Project Summary
+
+### 1. Chosen Vertical
+* **Vertical**: **Legal Tech / Contract Intelligence & Consumer & SMB Rights**
+* **Persona & Context**: Individuals, freelancers, employees, and small business owners who face complex, one-sided contracts (NDAs, Independent Contractor Agreements, Residential Leases, SaaS MSAs) without immediate in-house legal counsel.
+
+### 2. Approach and Dynamic AI Logic
+* **Context-Aware Decision Making**: Rather than generic summaries, LexiClear evaluates contracts through the specific user persona (e.g., assessing contractor liability vs. employer indemnity, or tenant deposit terms vs. landlord remedies).
+* **Strict Anti-Hallucination & Zero-Speculation Grounding**: The Q&A and simplification prompts explicitly enforce citation grounding: if an obligation, deadline, or liability cap is absent from the contract text, the assistant strictly declares it missing instead of fabricating common legal practices.
+* **Deterministic Structured JSON Output**: Employs Gemini's structured response mode (`responseMimeType: "application/json"`) with a deterministic temperature (`0.1`) to ensure predictable, schema-validated legal audit objects.
+* **Resilient Multi-Model Waterfall**: Incorporates automated model fallback across Google Gemini endpoints (`gemini-3.8-flash` → `gemini-flash-latest` → `gemini-3.1-flash-lite` → `gemini-3.1-pro-preview`) with immediate 429 quota-exhaustion detection and instant baseline caching.
+
+### 3. How the Solution Works
+1. **Document Ingestion & Context Framing**: Users select from representative high-stakes contracts (SaaS Master Services Agreement, Commercial Lease, Independent Contractor Agreement, Mutual NDA) or paste custom contract text.
+2. **Multi-Faceted Legal Audit (`/api/analyze-document`)**: Computes a normalized Risk Score (0–100), extracts contracting parties and relative leverage, categorizes clauses into Critical Traps / Moderate Risks / Standard Terms with exact verbatim quotes, and creates a pre-signing checklist.
+3. **Strict Citation-Grounded Q&A (`/api/ask-question`)**: Allows users to interrogate the contract. Answers cite specific section numbers or flag that the contract is silent on that issue.
+4. **Counter-Proposal & Redline Diff Engine (`/api/compare-documents`)**: Compares original contracts against proposed counter-offers or amendments, identifying dropped protections, expanded liabilities, and strategic negotiation positions.
+5. **Plain-English Clause Simplifier (`/api/simplify-clause`)**: Takes dense boilerplate legalese, explains who benefits, reveals hidden exposure, and provides balanced substitute language.
+6. **Attorney Consultation Brief & Offline PDF Export (`/api/generate-consultation-prep`)**: Assembles a structured agenda with prioritized risk points, high-impact questions to ask counsel to minimize billable hours, evidence to bring, and client-side PDF export.
+
+### 4. Assumptions Made
+* **Informational Assistance**: LexiClear assists users in understanding agreements and preparing for legal review; it does not replace licensed legal representation (prominently noted via disclaimers).
+* **Common Law Baseline**: Analysis rules focus on standard contractual principles (liability allocation, indemnities, intellectual property assignments, termination convenience, governing law).
+* **Text Format**: Contracts are processed as clean text strings (up to 150,000 characters).
+
+---
+
+## 🛡️ Evaluation Focus Areas
+
+| Focus Area | Implementation & Validation |
+| :--- | :--- |
+| **Code Quality** | Strict TypeScript throughout frontend and backend, modular component architecture (`/src/components`), organized API routers (`/server/routes`), centralized prompts (`/server/prompts`), zero compilation errors. |
+| **Security** | Zero API keys exposed on client; server-side proxy handles all GenAI calls; strict rate limiting (`express-rate-limit`); reverse proxy headers verified; `DOMPurify` HTML sanitization; input payload validation and character truncation limits. |
+| **Efficiency** | In-memory client caching avoids redundant Gemini API calls; vendor chunk code-splitting reduces bundle footprint; repository size is **< 1 MB** (well under the 10 MB limit). |
+| **Testing** | 19 automated unit tests using Vitest (`npm test`) validating prompt builders, JSON parser resilience, payload validation, and PDF utilities. |
+| **Accessibility** | Clean high-contrast typography, semantic HTML elements, accessible color tags for risk severities, keyboard-friendly modals, and mobile-responsive layout. |
 
 ---
 
